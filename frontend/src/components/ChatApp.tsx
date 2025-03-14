@@ -1,23 +1,28 @@
-
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ChatInput from "./ChatInput";
 import ChatMessages, { Message } from "./ChatMessages";
 import "./ChatApp.css";
+import { askQuestion } from "../services/chatService"
+
 const ChatApp: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [idCounter, setIdCounter] = useState(0);
+  const idCounterRef = useRef<number>(0);
   const addMessage = (text: string, sender: "user" | "bot") => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { id: idCounter, text, sender },
-    ]);
-    setIdCounter((prev) => prev + 1);
+    const id = idCounterRef.current;
+    setMessages((prevMessages) => [...prevMessages, { id, text, sender }]);
+    idCounterRef.current += 1;
   };
-  const handleSend = (userMessage: string) => {
+  const handleSend = async (userMessage: string) => {
+    // Afficher le message de l'utilisateur immédiatement
     addMessage(userMessage, "user");
-    setTimeout(() => {
-      addMessage("Réponse pour : " + userMessage, "bot");
-    }, 1000);
+    try {
+      // Utilise le service pour récupérer la réponse
+      const answer = await askQuestion(userMessage);
+      addMessage(answer, "bot");
+    } catch (error) {
+      console.error(error);
+      addMessage("Erreur lors de la récupération de la réponse depuis le serveur.", "bot");
+    }
   };
   return (
     <div className="chat-container">
