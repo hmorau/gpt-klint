@@ -1,0 +1,39 @@
+/* styles.css */
+
+/* Style pour le sélecteur */
+select {
+    appearance: none; /* Supprime l'apparence par défaut */
+    background-color: #fff; /* Couleur de fond blanche */
+    border: 1px solid #ccc; /* Bordure grise */
+    border-radius: 4px; /* Coins arrondis */
+    padding: 10px; /* Espacement intérieur */
+    font-size: 16px; /* Taille de la police */
+    cursor: pointer; /* Curseur en forme de pointeur */
+    width: 150px; /* Largeur du sélecteur */
+    position: relative; /* Positionnement relatif pour les éléments enfants */
+    top: 20px; /* Par exemple, 10px depuis le haut de son conteneur */
+    left: 30%; /* 30% depuis la gauche de l'écran / de son conteneur positionné */
+  }
+  
+  /* Style pour les options */
+  option {
+    padding: 10px; /* Espacement intérieur */
+    font-size: 16px; /* Taille de la police */
+  }
+  
+  /* Style pour l'option sélectionnée */
+  option:checked {
+    background-color: #f1f1f1; /* Couleur de fond de l'option sélectionnée */
+  }
+  
+  /* Style pour le sélecteur lorsqu'il est ouvert */
+  select:focus {
+    outline: none; /* Supprime le contour par défaut */
+    border-color: #007bff; /* Couleur de la bordure lorsqu'il est focus */
+  }
+  
+  /* Style pour l'option par défaut */
+  option[value=""] {
+    color: #999; /* Couleur du texte pour l'option par défaut */
+  }
+  
