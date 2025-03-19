@@ -3,16 +3,16 @@
 /* Style pour le sélecteur */
 select {
     appearance: none; /* Supprime l'apparence par défaut */
-    background-color: #fff; /* Couleur de fond blanche */
+    background-color: #e6e6e6d1; /* Couleur de fond  */
     border: 1px solid #ccc; /* Bordure grise */
-    border-radius: 4px; /* Coins arrondis */
+    border-radius: 12px; /* Coins arrondis */
     padding: 10px; /* Espacement intérieur */
     font-size: 16px; /* Taille de la police */
     cursor: pointer; /* Curseur en forme de pointeur */
     width: 150px; /* Largeur du sélecteur */
-    position: relative; /* Positionnement relatif pour les éléments enfants */
+    position: fixed; /* Positionnement relatif pour les éléments enfants */
     top: 20px; /* Par exemple, 10px depuis le haut de son conteneur */
-    left: 30%; /* 30% depuis la gauche de l'écran / de son conteneur positionné */
+    left: 15%; /* 30% depuis la gauche de l'écran / de son conteneur positionné */
   }
   
   /* Style pour les options */

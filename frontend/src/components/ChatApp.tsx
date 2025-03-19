@@ -3,10 +3,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ChatInput from "./ChatInput";
 import ChatMessages  from "./ChatMessages";
-import { Message } from "../services/conversationService";
-
+import { Message } from "../interfaces/interfaces"
+import { askQuestion, getMessages, createConversation } from "../services/conversationService";
 import "./ChatApp.css";
-import { askQuestion, getMessages, createConversation } from "../services/chatService";
+
 const ChatApp: React.FC = () => {
   // Récupération du paramètre conversationId depuis l'URL
   const { conversationId: routeConversationId } = useParams<{ conversationId: string }>();

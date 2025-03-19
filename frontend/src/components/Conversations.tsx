@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getConversations, deleteConversation, Conversation } from "../services/conversationService";
+import { Conversation } from "../interfaces/interfaces"
+import { getConversations, deleteConversation } from "../services/conversationService";
 import './Conversations.css'; // Importez le fichier CSS
 
 const Conversations: React.FC = () => {

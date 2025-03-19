@@ -21,11 +21,6 @@ const Sidebar: React.FC<SidebarProps> = ({ userName }) => {
       {!isCollapsed && (
         <div className="sidebar-content">
           <h3>{userName}</h3>
-          <ul>
-            <li>Accueil</li>
-            <li>Profil</li>
-            <li>Paramètres</li>
-          </ul>
           {/* Affichage du composant Conversations */}
           <div className="conversations-container">
             <h4>Conversations</h4>

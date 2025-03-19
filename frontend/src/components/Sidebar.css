@@ -28,10 +28,10 @@
     right: 10px; /* Ajustement de la position horizontale */
     width: 45px; /* Augmentation de la taille */
     height: 45px; /* Augmentation de la taille */
-    background-color: #007bff; /* Couleur de fond bleue */
-    border: 2px solid #0056b3; /* Bordure plus visible */
-    border-radius: 50%;
-    color: #fff; /* Couleur de texte blanche */
+    background-color: #e6e6e6d1; /* Couleur de fond  */
+    border: 5px solid #e6e6e667; /* Bordure plus visible */
+    border-radius: 20%;
+    color: #000; /* Couleur de texte blanche */
     font-size: 20px; /* Augmentation de la taille de la police */
     line-height: 43px; /* Centrage vertical du texte */
     text-align: center;
@@ -42,7 +42,7 @@
 
 /* Effet au survol du bouton */
 .sidebar .toggle-button:hover {
-    background-color: #0056b3; /* Couleur de survol plus foncée */
+    background-color: #e6e6e62f; /* Couleur de survol plus foncée */
     transform: scale(1.1); /* Agrandissement au survol */
 }
 

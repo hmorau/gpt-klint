@@ -2,6 +2,8 @@
 .conversation-list {
     list-style-type: none;
     padding: 0;
+    border-radius: 10px;
+    border: 0px solid #ccc;
   }
   
   /* Style pour chaque élément de conversation */
@@ -9,10 +11,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    padding: 12px;
+    border: 0px solid #ccc;
+    background-color: #f8f9fa;
+    border-radius: 1px;
+    margin-bottom: 0px;
     transition: background-color 0.3s;
   }
   

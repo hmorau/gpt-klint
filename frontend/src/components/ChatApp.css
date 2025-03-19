@@ -4,10 +4,10 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  min-height: 100vh; /* Pour occuper toute la hauteur de la fenêtre */
+  height: 80vh; /* Pour occuper toute la hauteur de la fenêtre */
   justify-content: center; /* Aligner verticalement au centre si besoin */
   box-sizing: border-box;
-  padding: 20px;
+  padding: 0px;
 }
 /* Style pour le message d'accueil centré */
 .chat-greeting {
