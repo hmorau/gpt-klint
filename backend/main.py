@@ -1,8 +1,11 @@
+import uuid
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import db
+from typing import Optional
 
+import db
+                  
 app = FastAPI()
 # Autoriser l'accès depuis votre application frontend
 origins = [
@@ -22,6 +25,15 @@ def get_conversations():
     conversations = db.get_conversations(user_id)
     return conversations
 
+@app.delete("/api/conversations/{conversation_id}", status_code=204)
+def delete_conversation(conversation_id: str):
+    """
+    Supprime une conversation identifiée par son id.
+    """
+    db.delete_conversation(conversation_id)
+    # Pas de contenu à renvoyer, donc on renvoie une réponse vide avec le statut 204    
+    return
+
 @app.get("/api/conversations/{conversation_id}/messages")
 def get_messages(conversation_id: str):
     messages = db.get_messages(conversation_id)
@@ -29,18 +41,34 @@ def get_messages(conversation_id: str):
 
 @app.get("/api/user")
 def user_endpoint():
-    return {"oid": "test", "name": "test"}
+    return {"oid": "6861fc94-7897-4422-8241-89787d0d14f1", "name": "test"}
 
 # Définir le modèle de données pour la requête
 class ChatRequest(BaseModel):
     question: str
+    conversationId: Optional[str] = None # Optionnel, si non fourni, la conversation sera créée
+
 @app.post("/api/chat")
 def chat_endpoint(request: ChatRequest):
-    # Ici vous pouvez implémenter la logique de traitement
-    input = request.question
+    if request.conversationId:
+        # Ici vous pouvez implémenter la logique de traitement
+        db.insert_message(request.conversationId, role = "user", contenu = request.question) 
+        reponse = f"Réponse pour : {request.question}"
+        db.insert_message(request.conversationId, role = "assistant", contenu = reponse) 
+        return {"answer": reponse, "conversationId": request.conversationId}
+    else: 
+        # enregistrement bdd de la nouvelle conversation
+        nouvelle_conversation = db.insert_conversation("6861fc94-7897-4422-8241-89787d0d14f1",request.question)
+        conversation_id = nouvelle_conversation["id"]
+        # enregistrement du message
+        db.insert_message(conversation_id, role = "user", contenu = request.question) 
+        # enregistrement de la réponse 
+        reponse= "Premiere reponse conversation"
+        db.insert_message(conversation_id, role = "assistant", contenu = reponse) 
+        #return {"answer": "", "conversationId": conversation_id}
+        return {"answer": reponse, "conversationId": conversation_id}
 
-    reponse = f"Réponse pour : {request.question}"
-    return {"answer": reponse}
+
 
 # Définition du modèle de données qui sera utilisé pour la validation de la requête
 class ModelSelection(BaseModel):

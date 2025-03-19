@@ -1,10 +1,7 @@
 import React from "react";
 import "./ChatMessages.css";
-export interface Message {
-  id: number;
-  text: string;
-  sender: "user" | "bot";
-}
+import { Message } from "../services/conversationService"
+
 interface ChatMessagesProps {
   messages: Message[];
 }

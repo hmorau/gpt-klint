@@ -31,7 +31,7 @@ La clé de partition est 'conversation_id' afin de regrouper les messages d'une 
         "conversation_id": conversation_id,
         "contenu": contenu,
         "role": role,  # Par exemple : "user" ou "assistant"
-        "created_at": datetime.datetime.utcnow().isoformat()
+        "created_at": datetime.utcnow().isoformat()
     }
     message_container.create_item(body=message_document)
     print("Message inséré :", message_document)
@@ -43,13 +43,12 @@ def insert_conversation(user_id, subject):
         "id": str(uuid.uuid4()),  # Identifiant unique de la conversation
         "user_id": user_id,
         "subject": subject,
-        "created_at": datetime.datetime.utcnow().isoformat(),
+        "created_at": datetime.utcnow().isoformat(),
         "status": "actif"
     }
     conversation_container.create_item(body=conversation_document)
     print("Conversation insérée :", conversation_document)
-    return conversation_document
-    pass 
+    return conversation_document 
 
 def get_conversations(user_id):
     """
@@ -79,3 +78,28 @@ def get_messages(conversation_id):
     ))
     print(f"Messages récupérés pour conversation_id {conversation_id}:", messages)
     return messages
+
+def delete_conversation(conversation_id: str) -> dict:
+    """
+    Supprime une conversation identifiée par son id.
+    Pour pouvoir supprimer un document, nous avons besoin de connaître la valeur de la clé de partition.
+    Ici, on suppose que la clé de partition est "user_id".
+    """
+    # Récupération de la conversation afin d'obtenir la valeur de la clé de partition
+    query = "SELECT * FROM c WHERE c.id = @conversation_id"
+    parameters = [{"name": "@conversation_id", "value": conversation_id}]
+    results = list(conversation_container.query_items(
+        query=query,
+        parameters=parameters,
+        enable_cross_partition_query=True
+    ))
+    if not results:
+        print(f"Aucune conversation trouvée avec l'id {conversation_id}.")
+        raise ValueError(f"Aucune conversation trouvée avec l'id {conversation_id}.")
+    
+    conversation_document = results[0]
+    partition_key_value = conversation_document["user_id"]
+    # Suppression de la conversation
+    conversation_container.delete_item(item=conversation_id, partition_key=partition_key_value)
+    print(f"Conversation supprimée : {conversation_document}")
+    return conversation_document

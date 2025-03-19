@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { getConversations, Conversation } from "../services/conversationService"; // Ajustez le chemin selon l'emplacement du service
+import { useNavigate } from "react-router-dom";
+import { getConversations, deleteConversation, Conversation } from "../services/conversationService";
+import './Conversations.css'; // Importez le fichier CSS
+
 const Conversations: React.FC = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [error, setError] = useState<string>("");
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // Récupération des conversations dès le montage du composant
     getConversations()
       .then((data) => setConversations(data))
       .catch((err) => {
@@ -12,33 +16,54 @@ const Conversations: React.FC = () => {
         setError("Erreur lors du chargement des conversations.");
       });
   }, []);
-  // Fonction appelée lors du clic sur un sujet de conversation
+
   const handleClick = (conversation: Conversation) => {
     console.log("Conversation sélectionnée :", conversation);
-    // Vous pouvez ajouter ici une redirection ou afficher les détails de la conversation
+    navigate(`/conversation/${conversation.id}`);
   };
+
+  const handleDelete = (id: string) => {
+    deleteConversation(id)
+      .then(() => {
+        setConversations(prev => prev.filter(conv => conv.id !== id));
+      })
+      .catch((err: any) => {
+        console.error(err);
+        setError("Erreur lors de la suppression de la conversation.");
+      });
+  };
+
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) {
+      return text;
+    }
+    return text.substring(0, maxLength) + "...";
+  };
+
   if (error) {
     return <div>{error}</div>;
   }
+
   if (conversations.length === 0) {
     return <div>Aucune conversation trouvée.</div>;
   }
+
   return (
     <div>
-      <ul>
+      <ul className="conversation-list">
         {conversations.map((conversation) => (
-          <li
-            key={conversation.id}
-            onClick={() => handleClick(conversation)}
-            style={{
-              cursor: "pointer",
-            }}
-          >
-            {conversation.subject}
+          <li key={conversation.id} className="conversation-item">
+            <span onClick={() => handleClick(conversation)}>
+              {truncateText(conversation.subject, 15)}
+            </span>
+            <button onClick={() => handleDelete(conversation.id)}>
+              -
+            </button>
           </li>
         ))}
       </ul>
     </div>
   );
 };
+
 export default Conversations;

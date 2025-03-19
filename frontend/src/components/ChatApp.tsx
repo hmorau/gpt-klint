@@ -1,35 +1,84 @@
-import React, { useState, useRef } from "react";
+// ChatApp.tsx
+import React, { useState, useRef, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import ChatInput from "./ChatInput";
-import ChatMessages, { Message } from "./ChatMessages";
-import "./ChatApp.css";
-import { askQuestion } from "../services/chatService"
+import ChatMessages  from "./ChatMessages";
+import { Message } from "../services/conversationService";
 
+import "./ChatApp.css";
+import { askQuestion, getMessages, createConversation } from "../services/chatService";
 const ChatApp: React.FC = () => {
+  // Récupération du paramètre conversationId depuis l'URL
+  const { conversationId: routeConversationId } = useParams<{ conversationId: string }>();
+  const navigate = useNavigate();
+  // On initialise le state avec la valeur issue de l'URL, et on le synchronise ensuite
+  const [conversationId, setConversationId] = useState<string | undefined>(routeConversationId);
   const [messages, setMessages] = useState<Message[]>([]);
   const idCounterRef = useRef<number>(0);
+  // Synchronisation du state avec le paramètre d'URL
+  useEffect(() => {
+    setConversationId(routeConversationId);
+  }, [routeConversationId]);
   const addMessage = (text: string, sender: "user" | "bot") => {
     const id = idCounterRef.current;
     setMessages((prevMessages) => [...prevMessages, { id, text, sender }]);
     idCounterRef.current += 1;
   };
   const handleSend = async (userMessage: string) => {
-    // Afficher le message de l'utilisateur immédiatement
+    console.log("début handleSend");
+    // Affiche immédiatement le message de l'utilisateur
     addMessage(userMessage, "user");
+    // Si aucune conversation n'existe, la crée et met à jour l'URL
+    if (!conversationId) {
+      try {
+        const newConversation = await createConversation(userMessage);
+        setConversationId(newConversation.id);
+        navigate(`/conversation/${newConversation.id}`, { replace: true });
+        // Ici, on peut directement afficher la réponse déjà renvoyée par createConversation si besoin
+        // Exemple : addMessage(newConversation.answer, "bot");
+        return; // On retourne pour ne pas continuer et appeler askQuestion
+      } catch (error) {
+        console.error("Erreur lors de la création de la conversation", error);
+        addMessage("Erreur lors de la création de la conversation.", "bot");
+        return;
+      }
+    }
+    // Envoie du message et récupération de la réponse du bot dans le cas d'une conversation existante
     try {
-      // Utilise le service pour récupérer la réponse
-      const answer = await askQuestion(userMessage);
+      const answer = await askQuestion(userMessage, conversationId);
       addMessage(answer, "bot");
     } catch (error) {
       console.error(error);
-      addMessage("Erreur lors de la récupération de la réponse depuis le serveur.", "bot");
+      addMessage("Erreur lors de la récupération de la réponse.", "bot");
     }
   };
+  // Fonction pour charger les messages depuis le backend
+  const loadMessages = async (convId: string) => {
+    console.log("debut load messages");
+    try {
+      const fetchedMessages = await getMessages(convId);
+      // Transformer les messages pour qu'ils correspondent au format attendu par ChatMessages
+      const mappedMessages = fetchedMessages.map((m: any) => ({
+        id: m.id,
+        text: m.contenu, // "contenu" du back sera utilisé comme texte du message
+        sender: (m.role === "assistant" ? "bot" : "user") as "user" | "bot" // adapter en fonction du rôle
+      }));
+      setMessages(mappedMessages);
+    } catch (error) {
+      console.error(error);
+      addMessage("Erreur lors du chargement des messages depuis le serveur.", "bot");
+    }
+  };
+  // Recharge les messages quand conversationId change
+  useEffect(() => {
+    if (conversationId) {
+      loadMessages(conversationId);
+    }
+  }, [conversationId]);
   return (
     <div className="chat-container">
       {messages.length === 0 && (
-        <div className="chat-greeting">
-          Comment puis-je vous aider ?
-        </div>
+        <div className="chat-greeting">Comment puis-je vous aider ?</div>
       )}
       <ChatMessages messages={messages} />
       <ChatInput onSend={handleSend} />
