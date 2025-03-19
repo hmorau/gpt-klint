@@ -1,16 +1,15 @@
 import React, { useState, useRef } from "react";
+import TextareaAutosize from "react-textarea-autosize";
 import "./ChatInput.css";
 interface ChatInputProps {
-  // La fonction onSend reçoit le message et éventuellement un fichier
   onSend: (message: string, file?: File) => void;
 }
 const ChatInput: React.FC<ChatInputProps> = ({ onSend }) => {
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent | React.KeyboardEvent) => {
     e.preventDefault();
-    // Autoriser l'envoi si le message n'est pas vide ou s'il y a un fichier
     if (message.trim() !== "" || selectedFile) {
       onSend(message, selectedFile || undefined);
       setMessage("");
@@ -25,19 +24,26 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend }) => {
       setSelectedFile(e.target.files[0]);
     }
   };
+  // Gestion de l'appui sur entrée
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Si 'Enter' est pressé sans 'Shift' => envoyer le message
+    if (e.key === "Enter" && !e.shiftKey) {
+      handleSubmit(e);
+    }
+  };
   return (
     <form className="chat-input-form" onSubmit={handleSubmit}>
-      <input
-        type="text"
+      <TextareaAutosize
         value={message}
         onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder="Tapez un message..."
         className="chat-input-input"
+        minRows={1}
+        style={{ resize: "none" }} // Désactive le redimensionnement manuel
       />
       <div className="chat-input-button-row">
-        {/* Bouton pour joindre un document */}
         <div className="chat-input-file">
-          {/* Input type file caché */}
           <input
             type="file"
             id="fileUpload"
@@ -56,7 +62,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend }) => {
             <span className="file-name">{selectedFile.name}</span>
           )}
         </div>
-        {/* Bouton d'envoi */}
         <button type="submit" className="chat-input-button">
           Envoyer
         </button>

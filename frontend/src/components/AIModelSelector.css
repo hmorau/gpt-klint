@@ -3,16 +3,20 @@
 /* Style pour le sélecteur */
 select {
     appearance: none; /* Supprime l'apparence par défaut */
-    background-color: #e6e6e6d1; /* Couleur de fond  */
-    border: 1px solid #ccc; /* Bordure grise */
-    border-radius: 12px; /* Coins arrondis */
     padding: 10px; /* Espacement intérieur */
     font-size: 16px; /* Taille de la police */
     cursor: pointer; /* Curseur en forme de pointeur */
     width: 150px; /* Largeur du sélecteur */
-    position: fixed; /* Positionnement relatif pour les éléments enfants */
-    top: 20px; /* Par exemple, 10px depuis le haut de son conteneur */
+    position: absolute; /* Positionnement relatif pour les éléments enfants */
+    top: 15%; /* Par exemple, 10px depuis le haut de son conteneur */
     left: 15%; /* 30% depuis la gauche de l'écran / de son conteneur positionné */
+
+    height: 45px; /* Augmentation de la taille */
+    background-color: #e6e6e6d1; /* Couleur de fond  */
+    border: 5px solid #e6e6e667; /* Bordure plus visible */
+    border-radius: 8%;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère pour plus de relief */
   }
   
   /* Style pour les options */
