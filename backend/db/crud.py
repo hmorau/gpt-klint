@@ -8,8 +8,8 @@ load_dotenv()
 
 COSMOS_ENDPOINT = os.getenv("COSMOS_ENDPOINT")
 COSMOS_KEY = os.getenv("COSMOS_KEY")
-DATABASE_NAME = os.getenv("COSMOSDB_DATABASE")
-CONTAINER_NAME = os.getenv("COSMOSDB_CONTAINER")
+DATABASE_NAME = os.getenv("AZE_COSMOSDB_DATABASE")
+CONTAINER_NAME = os.getenv("AZE_COSMOSDB_CONVERSATION_CONTAINER")
 
 client = CosmosClient(COSMOS_ENDPOINT, credential=COSMOS_KEY)
 database = client.get_database_client(DATABASE_NAME)
