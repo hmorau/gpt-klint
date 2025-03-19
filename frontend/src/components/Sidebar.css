@@ -16,6 +16,17 @@
     padding: 20px; /* Espacement interne */
     box-sizing: border-box;
 }
+
+.sidebar .new-chat-button {
+    position: absolute;
+    left: 20px;
+    top: 20px; /* Ajustement de la position verticale */
+    border: 1px solid #e6e6e667; /* Bordure plus visible */
+    background-color: #e6e6e6d1; /* Couleur de fond  */
+    border-radius: 10%;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
 /* Etat replié de la sidebar */
 .sidebar.collapsed {
     width: 50px; /* état replié */
@@ -54,3 +65,4 @@
     padding: 10px;
     box-sizing: border-box;
 }
+

@@ -75,6 +75,14 @@ const ChatApp: React.FC = () => {
       loadMessages(conversationId);
     }
   }, [conversationId]);
+
+  useEffect(() => {
+    if (!conversationId) {
+      setMessages([]);
+      idCounterRef.current = 0;
+    }
+  }, [conversationId]);
+  
   return (
     <div className="chat-container">
       {messages.length === 0 && (

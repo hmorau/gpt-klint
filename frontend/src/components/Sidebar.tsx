@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "./Sidebar.css";
 import Conversations from "./Conversations"; // Assurez-vous que le chemin est correct
 interface SidebarProps {
@@ -20,6 +21,12 @@ const Sidebar: React.FC<SidebarProps> = ({ userName }) => {
       {/* Contenu de la sidebar, masqué si la sidebar est repliée */}
       {!isCollapsed && (
         <div className="sidebar-content">
+          {/* Bouton "Nouveau chat" redirigeant vers "/" */}
+          <div className="new-chat-button">
+            <Link to="/">
+              <button>Nouveau chat</button>
+            </Link>
+          </div>
           <h3>{userName}</h3>
           {/* Affichage du composant Conversations */}
           <div className="conversations-container">
