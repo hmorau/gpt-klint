@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from api import api
+from api import user
+
 from fastapi.middleware.cors import CORSMiddleware
                   
 app = FastAPI()
@@ -17,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(api.router, prefix="/api", tags=["api"])
+app.include_router(user.router, prefix="/api", tags=["user"])
 
 
 @app.get("/")
