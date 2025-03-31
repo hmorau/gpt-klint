@@ -57,10 +57,10 @@ const ChatApp: React.FC = () => {
     console.log("debut load messages");
     try {
       const fetchedMessages = await getMessages(convId);
+
       // Transformer les messages pour qu'ils correspondent au format attendu par ChatMessages
       const mappedMessages = fetchedMessages.map((m: any) => ({
-        id: m.id,
-        text: m.contenu, // "contenu" du back sera utilisé comme texte du message
+        text: m.content, // "contenu" du back sera utilisé comme texte du message
         sender: (m.role === "assistant" ? "bot" : "user") as "user" | "bot" // adapter en fonction du rôle
       }));
       setMessages(mappedMessages);

@@ -20,86 +20,68 @@ MESSAGE_CONTAINER_NAME = "Message"
 conversation_container = database.get_container_client(CONVERSATION_CONTAINER_NAME)
 message_container = database.get_container_client(MESSAGE_CONTAINER_NAME)
 
+def list_conversations(entra_oid: str) -> list:
+    """
+    Récupère la liste des conversations de l'utilisateur,
+    en incluant le champ 'type' pour distinguer 'chat' de 'doc'.
+    """
+    query = (
+        "SELECT c.id, c.title, c.created_at, c.updated_at, c.type "
+        "FROM c "
+        "WHERE c.entra_oid = @entra_oid "
+        "ORDER BY c.updated_at DESC"
+    )
+    parameters = [{"name": "@entra_oid", "value": entra_oid}]
+    items = container.query_items(query=query, parameters=parameters, enable_cross_partition_query=True)
+    return list(items)
 
-def insert_message(conversation_id: str, role: str, contenu: str) -> dict:
-    """
-    Insère un message dans le conteneur Message.
-La clé de partition est 'conversation_id' afin de regrouper les messages d'une même conversation.
-    """
-    message_document = {
-        "id": str(uuid.uuid4()),  # Identifiant unique du message
-        "conversation_id": conversation_id,
-        "contenu": contenu,
-        "role": role,  # Par exemple : "user" ou "assistant"
-        "created_at": datetime.utcnow().isoformat()
-    }
-    message_container.create_item(body=message_document)
-    print("Message inséré :", message_document)
-    return message_document
-
-
-def insert_conversation(user_id, subject):
-    conversation_document = {
-        "id": str(uuid.uuid4()),  # Identifiant unique de la conversation
-        "user_id": user_id,
-        "subject": subject,
-        "created_at": datetime.utcnow().isoformat(),
-        "status": "actif"
-    }
-    conversation_container.create_item(body=conversation_document)
-    print("Conversation insérée :", conversation_document)
-    return conversation_document 
-
-def get_conversations(user_id):
-    """
-    Récupère la liste des conversations associées à un user_id donné.
-    """
-    query = "SELECT c.id, c.subject FROM c WHERE c.user_id = @user_id"
-    parameters = [{"name": "@user_id", "value": user_id}]
-    conversations = list(conversation_container.query_items(
-        query=query,
-        parameters=parameters,
-        enable_cross_partition_query=True
-    ))
-    print(f"Conversations récupérées pour user_id {user_id}:", conversations)
-    return conversations
-
-def get_messages(conversation_id):
-    """
-    Récupère la liste des messages associés à une conversation identifiée par conversation_id.
-    Les messages sont triés par ordre chronologique (du plus ancien au plus récent).
-    """
-    query = "SELECT * FROM c WHERE c.conversation_id = @conversation_id ORDER BY c.created_at ASC"
-    parameters = [{"name": "@conversation_id", "value": conversation_id}]
-    messages = list(message_container.query_items(
-        query=query,
-        parameters=parameters,
-        enable_cross_partition_query=True
-    ))
-    print(f"Messages récupérés pour conversation_id {conversation_id}:", messages)
-    return messages
-
-def delete_conversation(conversation_id: str) -> dict:
-    """
-    Supprime une conversation identifiée par son id.
-    Pour pouvoir supprimer un document, nous avons besoin de connaître la valeur de la clé de partition.
-    Ici, on suppose que la clé de partition est "user_id".
-    """
-    # Récupération de la conversation afin d'obtenir la valeur de la clé de partition
-    query = "SELECT * FROM c WHERE c.id = @conversation_id"
-    parameters = [{"name": "@conversation_id", "value": conversation_id}]
-    results = list(conversation_container.query_items(
-        query=query,
-        parameters=parameters,
-        enable_cross_partition_query=True
-    ))
-    if not results:
-        print(f"Aucune conversation trouvée avec l'id {conversation_id}.")
-        raise ValueError(f"Aucune conversation trouvée avec l'id {conversation_id}.")
+def get_conversation(entra_oid: str, conversation_id: str) -> dict:
+    print("debut get conversation")
+    try:
+        item = container.read_item(conversation_id, partition_key=entra_oid) # 
+        return item
+    except Exception as e:
+        print(f"[get_conversation] Erreur : {e}")
+        return None
     
-    conversation_document = results[0]
-    partition_key_value = conversation_document["user_id"]
-    # Suppression de la conversation
-    conversation_container.delete_item(item=conversation_id, partition_key=partition_key_value)
-    print(f"Conversation supprimée : {conversation_document}")
-    return conversation_document
+def update_conversation(conversation_data: dict) -> None:
+    """
+    Met à jour la conversation dans la base de données.
+    """
+    entra_oid = conversation_data.get("entra_oid")
+    conversation_data["updated_at"] = datetime.utcnow().isoformat()
+    # Ici aussi, pas besoin de passer 'partition_key'
+    container.upsert_item(conversation_data)
+
+def create_conversation(entra_oid: str, initial_message: str = None, conversation_type="chat") -> dict:
+    """
+    Crée une nouvelle conversation dans la base de données,
+    avec un type par défaut = 'chat' (ou 'doc' pour la partie docs).
+    """
+    conversation_id = str(uuid.uuid4())
+    now = datetime.utcnow().isoformat()
+    
+    if initial_message:
+        title = initial_message[:30]  # Titre basé sur les premiers caractères du message
+        messages = [{"role": "user", "content": initial_message}]
+    else:
+        title = f"Nouveau Chat {now[:19]}"
+        messages = [{"role": "assistant", "content": "Bonjour, comment puis-je vous aider ?"}]
+    
+    doc = {
+        "id": conversation_id,
+        "entra_oid": entra_oid,  # Cette valeur correspond à la clé de partition déjà définie dans le conteneur
+        "session_id": conversation_id,
+        "title": title,
+        "created_at": now,
+        "updated_at": now,
+        "messages": messages,
+        "type": conversation_type  # On stocke explicitement le type
+    }
+    
+    # On ne passe pas 'partition_key' ici car le conteneur est déjà configuré avec cette clé
+    container.create_item(doc)
+    return doc
+
+def delete_conversation(entra_oid: str, conversation_id: str) -> None:
+    container.delete_item(conversation_id, partition_key=entra_oid)

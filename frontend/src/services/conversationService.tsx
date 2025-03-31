@@ -79,6 +79,11 @@ export const getMessages = async (conversationId: string): Promise<Message[]> =>
   if (!response.ok) {
     throw new Error("Erreur lors de la récupération des messages.");
   }
-  const messages: Message[] = await response.json();
+  const data = await response.json(); // data contient l'objet avec `messages`
+  if (!data.messages || !Array.isArray(data.messages)) {
+    throw new Error("Les messages ne sont pas sous forme de tableau.");
+  }
+
+  const messages: Message[] = await data.messages;
   return messages;
 };

@@ -35,9 +35,9 @@ const Conversations: React.FC = () => {
   };
 
   const truncateText = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) {
-      return text;
-    }
+   if (text.length <= maxLength) {
+     return text;
+   }
     return text.substring(0, maxLength) + "...";
   };
 
@@ -55,7 +55,7 @@ const Conversations: React.FC = () => {
         {conversations.map((conversation) => (
           <li key={conversation.id} className="conversation-item">
             <span onClick={() => handleClick(conversation)}>
-              {truncateText(conversation.subject, 15)}
+              {truncateText(conversation.title, 15)}
             </span>
             <button onClick={() => handleDelete(conversation.id)}>
               -

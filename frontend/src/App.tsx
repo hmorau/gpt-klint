@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import ChatApp from "./components/ChatApp";
-import Sidebar from "./components/SideBar";
+import Sidebar from "./components/Sidebar";
 import AIModelSelector from "./components/AIModelSelector";
 import { getCurrentUser, User } from "./services/userService";
 import { Routes, Route } from "react-router-dom";
