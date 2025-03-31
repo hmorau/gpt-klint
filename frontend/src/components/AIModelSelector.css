@@ -7,9 +7,9 @@ select {
     font-size: 16px; /* Taille de la police */
     cursor: pointer; /* Curseur en forme de pointeur */
     width: 150px; /* Largeur du sélecteur */
-    position: absolute; /* Positionnement relatif pour les éléments enfants */
-    top: 15%; /* Par exemple, 10px depuis le haut de son conteneur */
-    left: 15%; /* 30% depuis la gauche de l'écran / de son conteneur positionné */
+    position: fixed; /* Positionnement relatif pour les éléments enfants */
+    top: 3%; /* Par exemple, 10px depuis le haut de son conteneur */
+    left: 25%; /* 30% depuis la gauche de l'écran / de son conteneur positionné */
 
     height: 45px; /* Augmentation de la taille */
     background-color: #e6e6e6d1; /* Couleur de fond  */
